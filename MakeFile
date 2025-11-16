@@ -1,0 +1,24 @@
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c11
+
+
+# Sources
+SRCS = main.c card.c deck.c game.c player.c engine.c
+OBJS = $(SRCS:.c=.o)
+TARGET = game
+DLL = game.dll
+
+all: $(TARGET)
+
+$(TARGET): main.o card.o deck.o game.o player.o
+	$(CC) main.o card.o deck.o game.o player.o -o $(TARGET)
+
+# Build DLL (shared library) exporting the engine API
+dll: card.o deck.o game.o player.o engine.o
+	$(CC) -shared -Wl,--out-implib,libgame.a -o $(DLL) card.o deck.o game.o player.o engine.o
+
+%.o: %.c
+	$(CC) $(CFLAGS) -DBUILDING_ENGINE -c $< -o $@
+
+clean:
+	del /Q *.o $(TARGET).exe $(DLL) libgame.a
